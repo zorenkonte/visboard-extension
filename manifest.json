@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "Laser Pointer",
+  "version": "1.0",
+  "description": "Toggle a laser pointer on any webpage with hotkeys, like Google Meet's disappearing ink",
+  "permissions": [
+    "activeTab"
+  ],
+  "commands": {
+    "toggle-laser": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+L",
+        "mac": "Command+Shift+L"
+      },
+      "description": "Toggle laser pointer"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Laser Pointer",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["laser.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

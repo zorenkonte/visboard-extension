@@ -1,44 +1,48 @@
-# Laser Pointer Chrome Extension
+# Visboard Chrome Extension
 
-A Chrome extension that adds a laser pointer effect to any webpage, similar to Google Meet's disappearing ink feature.
+Visboard is a lightweight screen annotation extension for Chrome. It adds a laser pointer / drawing overlay to any webpage, with smooth fade and shortcut-based controls.
 
 ## Features
 
-- 🎯 Toggle laser pointer mode with keyboard shortcut
-- ✨ Smooth fading trail effect (like Excalidraw)
-- ⌨️ Press `Esc` to instantly exit laser mode
-- 🚫 Blocks page clicks while laser mode is active
-- 🖱️ Hold and drag to draw
-- 🌐 Works on any webpage
+- 🎯 Toggle annotation mode with keyboard shortcut
+- ✨ Smooth fading trail effect
+- 🖊️ Draw with mouse drag and hold
+- 🌈 Color support for marker and pointer (future expansion)
+- 🛠️ Hide UI and show only drawing overlay (future feature)
+- 🌐 Works on all websites
 
 ## Installation
 
-1. Open Chrome and navigate to `chrome://extensions/`
+1. Open Chrome and go to `chrome://extensions/`
 2. Enable "Developer mode" in the top right
 3. Click "Load unpacked"
-4. Select the `laser-pointer-extension` folder
+4. Select the `laser-pointer-extension` folder (or your cloned repository folder)
 
 ## Usage
 
-1. **Toggle Laser Pointer Mode**: 
+1. **Toggle Visboard Overlay**: 
    - Windows/Linux: `Ctrl + Shift + L`
-   - Mac: `Command + Shift + L`
+   - macOS: `Command + Shift + L`
 
-2. **Draw**: Hold down the mouse button and drag to draw with the laser pointer
-3. The trail will automatically fade out like disappearing ink
-4. Press `Esc` (or the hotkey again) to turn off laser pointer mode
-5. While laser mode is active, page elements are intentionally not clickable
+2. **Draw**: Hold down the mouse button and drag on the page
+3. **Exit**: Press `Esc` or the toggle hotkey again
+4. While overlay is active, page interactions are throttled intentionally to keep drawing stable
 
-## Customization
+## Shortcut Customization
 
-You can customize the hotkey by:
-1. Going to `chrome://extensions/shortcuts`
-2. Finding "Laser Pointer"
-3. Setting your preferred keyboard shortcut
+1. Open `chrome://extensions/shortcuts`
+2. Find "Toggle laser pointer" or "Visboard toggle"
+3. Set your preferred key combo
 
-## How It Works
+## Project Structure
 
-- Creates an overlay canvas on the page
-- Draws a fading trail that follows your cursor
-- Trail points automatically fade out using Excalidraw's decay timing
-- Uses requestAnimationFrame for smooth animation
+- `manifest.json` — extension metadata and permissions
+- `background.js` — service worker controls extension behavior
+- `content.js` — injects overlay and handles pointer events
+- `laser.css` — overlay styles
+- `icon16.png`, `icon48.png`, `icon128.png` — extension icons
+
+## License
+
+MIT
+

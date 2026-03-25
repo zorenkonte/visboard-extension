@@ -21,9 +21,9 @@
   "action": {
     "default_title": "Visboard",
     "default_icon": {
-      "16": "assets/icon16.jpeg",
-      "48": "assets/icon48.jpeg",
-      "128": "assets/icon128.jpeg"
+      "16": "assets/icon16.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
     }
   },
   "content_scripts": [
@@ -35,9 +35,9 @@
     }
   ],
   "icons": {
-    "16": "assets/icon16.jpeg",
-    "32": "assets/icon32.jpeg",
-    "48": "assets/icon48.jpeg",
-    "128": "assets/icon128.jpeg"
+    "16": "assets/icon16.png",
+    "32": "assets/icon32.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
   }
 }

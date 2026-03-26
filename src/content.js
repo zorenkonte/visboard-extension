@@ -3,13 +3,14 @@ let svgContainer = null;
 let animationFrame = null;
 let isDrawing = false;
 let activePointerId = null;
-let currentPath = null;
+let currentTrail = null;
 
-const trails = [];
+const pastTrails = [];
 const DECAY_TIME = 1000;
 const DECAY_LENGTH = 50;
 const LASER_COLOR = "red";
 const MIN_POINT_DISTANCE = 0.8;
+let pathElement = null;
 
 const laserCursorSVG = `data:image/svg+xml,${encodeURIComponent(
   `<svg viewBox="0 0 24 24" stroke-width="1" width="28" height="28" xmlns="http://www.w3.org/2000/svg"><path stroke="#1b1b1f" fill="#fff" d="m7.868 11.113 7.773 7.774a2.359 2.359 0 0 0 1.667.691 2.368 2.368 0 0 0 2.357-2.358c0-.625-.248-1.225-.69-1.667L11.201 7.78 9.558 9.469l-1.69 1.643v.001Zm10.273 3.606-3.333 3.333m-3.25-6.583 2 2m-7-7 3 3M3.664 3.625l1 1M2.529 6.922l1.407-.144m5.735-2.932-1.118.866M4.285 9.823l.758-1.194m1.863-6.207-.13 1.408"/></svg>`,
@@ -115,7 +116,6 @@ class LaserPointer {
     const lastPoint = this.originalPoints[this.originalPoints.length - 1];
     if (lastPoint) {
       if (lastPoint[0] === point[0] && lastPoint[1] === point[1]) return;
-      if (dist(lastPoint, point) < MIN_POINT_DISTANCE) return;
     }
 
     this.originalPoints.push(point);
@@ -315,7 +315,7 @@ class LaserPointer {
     const startCap = [];
     const endCap = [];
 
-    if (startCapSize > 1) {
+    if (startCapSize > 0.1) {
       for (let theta = 0; theta <= Math.PI; theta += Math.PI / 16) {
         startCap.unshift(add(first, rot(smul(ppdirFS, startCapSize), -theta)));
       }
@@ -344,11 +344,6 @@ class LaserPointer {
 class Trail {
   constructor() {
     this.pointer = null;
-    this.pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    this.pathElement.setAttribute("fill", LASER_COLOR);
-    this.pathElement.setAttribute("stroke", "none");
-    this.pathElement.setAttribute("opacity", "1");
-    svgContainer?.appendChild(this.pathElement);
   }
 
   startPath(x, y) {
@@ -376,19 +371,34 @@ class Trail {
     this.pointer.close();
   }
 
-  update() {
+  isAlive() {
     if (!this.pointer) return false;
     const outline = this.pointer.getStrokeOutline();
-    const d = getSvgPathFromStroke(outline, true);
-    this.pathElement.setAttribute("d", d);
     return outline.length > 0;
   }
+}
 
-  remove() {
-    if (this.pathElement.parentNode) {
-      this.pathElement.parentNode.removeChild(this.pathElement);
-    }
+function renderAllTrails() {
+  if (!pathElement || !svgContainer) return;
+  
+  const paths = [];
+
+  // Draw past trails
+  for (const trail of pastTrails) {
+    const outline = trail.pointer.getStrokeOutline();
+    const d = getSvgPathFromStroke(outline, true);
+    if (d) paths.push(d);
   }
+
+  // Draw current trail
+  if (currentTrail && currentTrail.pointer) {
+    const outline = currentTrail.pointer.getStrokeOutline();
+    const d = getSvgPathFromStroke(outline, true);
+    if (d) paths.push(d);
+  }
+
+  const svgPaths = paths.join(" ").trim();
+  pathElement.setAttribute("d", svgPaths);
 }
 
 function ensureAnimation() {
@@ -400,15 +410,16 @@ function ensureAnimation() {
 function tick() {
   animationFrame = null;
 
-  for (let i = trails.length - 1; i >= 0; i--) {
-    const alive = trails[i].update();
-    if (!alive) {
-      trails[i].remove();
-      trails.splice(i, 1);
+  renderAllTrails();
+
+  // Clean up dead trails
+  for (let i = pastTrails.length - 1; i >= 0; i--) {
+    if (!pastTrails[i].isAlive()) {
+      pastTrails.splice(i, 1);
     }
   }
 
-  if (laserActive || trails.length > 0 || currentPath) {
+  if (laserActive || pastTrails.length > 0 || currentTrail) {
     ensureAnimation();
   } else {
     removeLaserOverlay();
@@ -432,6 +443,11 @@ function createLaserOverlay() {
   hitArea.setAttribute("pointer-events", "all");
   svgContainer.appendChild(hitArea);
 
+  pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  pathElement.setAttribute("fill", LASER_COLOR);
+  pathElement.setAttribute("stroke", "none");
+  svgContainer.appendChild(pathElement);
+
   document.body.appendChild(svgContainer);
 }
 
@@ -444,13 +460,14 @@ function removeLaserOverlay() {
   if (svgContainer) {
     svgContainer.remove();
     svgContainer = null;
+    pathElement = null;
   }
   if (animationFrame) {
     cancelAnimationFrame(animationFrame);
     animationFrame = null;
   }
-  currentPath = null;
-  trails.length = 0;
+  currentTrail = null;
+  pastTrails.length = 0;
 }
 
 function consumeLaserEvent(e) {
@@ -465,14 +482,14 @@ function handlePointerMove(e) {
 
   if (
     !isDrawing ||
-    !currentPath ||
+    !currentTrail ||
     activePointerId === null ||
     e.pointerId !== activePointerId
   ) {
     return;
   }
 
-  currentPath.addPointToPath(e.clientX, e.clientY);
+  currentTrail.addPointToPath(e.clientX, e.clientY);
 }
 
 function handlePointerDown(e) {
@@ -483,9 +500,8 @@ function handlePointerDown(e) {
 
   activePointerId = e.pointerId;
   isDrawing = true;
-  currentPath = new Trail();
-  currentPath.startPath(e.clientX, e.clientY);
-  trails.push(currentPath);
+  currentTrail = new Trail();
+  currentTrail.startPath(e.clientX, e.clientY);
   ensureAnimation();
 }
 
@@ -495,13 +511,15 @@ function handlePointerUp(e) {
   if (activePointerId === null || e.pointerId !== activePointerId) return;
 
   activePointerId = null;
-  if (!currentPath) {
+  if (!currentTrail) {
     isDrawing = false;
     return;
   }
 
-  currentPath.endPath();
-  currentPath = null;
+  currentTrail.addPointToPath(e.clientX, e.clientY);
+  currentTrail.endPath();
+  pastTrails.push(currentTrail);
+  currentTrail = null;
   isDrawing = false;
   ensureAnimation();
 }
@@ -545,11 +563,12 @@ function setLaserMode(enabled) {
     window.removeEventListener("keydown", handleKeyDown, true);
     document.body.style.cursor = "";
     updateOverlayInteractivity();
-    if (currentPath) {
-      currentPath.endPath();
-      currentPath = null;
+    if (currentTrail) {
+      currentTrail.endPath();
+      pastTrails.push(currentTrail);
+      currentTrail = null;
     }
-    if (trails.length === 0) {
+    if (pastTrails.length === 0) {
       removeLaserOverlay();
     } else {
       ensureAnimation();

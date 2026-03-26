@@ -18,6 +18,9 @@ function copyExtensionFilesPlugin() {
       copyToDist("manifest.json", "manifest.json");
       copyToDist("assets", "assets");
       copyToDist("src/laser.css", "src/laser.css");
+      copyToDist("src/popup.html", "src/popup.html");
+      copyToDist("src/popup.css", "src/popup.css");
+      copyToDist("src/popup.js", "src/popup.js");
     },
   };
 }

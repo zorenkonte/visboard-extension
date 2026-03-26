@@ -41,7 +41,9 @@ npm run dev
 - Toggle Visboard overlay
    - Windows/Linux: `Ctrl + Shift + L`
    - macOS: `Command + Shift + L`
+- Open app UI: click the Visboard extension icon
 - Draw: hold mouse button and drag
+- Change laser color: use the color picker in the extension popup UI
 - Exit: press `Esc` or toggle again
 
 ## Architecture

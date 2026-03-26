@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visboard</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <header class="popup__header">
+        <img class="popup__icon" src="../assets/icon48.png" alt="Visboard" />
+        <div>
+          <h1>Visboard</h1>
+          <p>Quick laser settings</p>
+        </div>
+      </header>
+
+      <section class="popup__card" aria-label="Laser settings">
+        <div class="setting-row">
+          <label for="laser-color-input">Laser color</label>
+          <input id="laser-color-input" type="color" aria-label="Laser color" />
+        </div>
+      </section>
+
+      <footer class="popup__hint">Toggle laser: <strong>Cmd/Ctrl + Shift + L</strong></footer>
+    </main>
+
+    <script src="./popup.js"></script>
+  </body>
+</html>

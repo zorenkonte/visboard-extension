@@ -8,6 +8,7 @@ export class LaserController {
     this.svgContainer = null;
     this.pathElement = null;
     this.animationFrame = null;
+    this.laserColor = LASER_COLOR;
 
     this.isDrawing = false;
     this.activePointerId = null;
@@ -19,7 +20,19 @@ export class LaserController {
     this.handlePointerUp = this.handlePointerUp.bind(this);
     this.handleClickBlock = this.handleClickBlock.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handleStorageChange = this.handleStorageChange.bind(this);
     this.tick = this.tick.bind(this);
+
+    chrome.storage.local
+      .get({ laserColor: LASER_COLOR })
+      .then(({ laserColor }) => {
+        this.updateLaserColor(laserColor);
+      })
+      .catch(() => {
+        this.updateLaserColor(LASER_COLOR);
+      });
+
+    chrome.storage.onChanged.addListener(this.handleStorageChange);
   }
 
   toggle() {
@@ -118,11 +131,25 @@ export class LaserController {
     this.svgContainer.appendChild(hitArea);
 
     this.pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    this.pathElement.setAttribute("fill", LASER_COLOR);
+    this.pathElement.setAttribute("fill", this.laserColor);
     this.pathElement.setAttribute("stroke", "none");
     this.svgContainer.appendChild(this.pathElement);
 
     document.body.appendChild(this.svgContainer);
+  }
+
+  updateLaserColor(nextColor) {
+    if (typeof nextColor !== "string") return;
+    this.laserColor = nextColor;
+    if (this.pathElement) {
+      this.pathElement.setAttribute("fill", this.laserColor);
+    }
+  }
+
+  handleStorageChange(changes, areaName) {
+    if (areaName !== "local") return;
+    if (!changes.laserColor) return;
+    this.updateLaserColor(changes.laserColor.newValue);
   }
 
   removeLaserOverlay() {

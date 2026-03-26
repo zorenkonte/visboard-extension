@@ -19,6 +19,16 @@ npm run build
 - `npm run build` creates a minified extension package in `dist/`
 - Output keeps Chrome manifest paths (`src/background.js`, `src/content.js`, `src/laser.css`)
 
+### Fast iteration loop
+
+```bash
+npm run dev
+```
+
+- `npm run dev` runs Vite in watch mode and rebuilds `dist/` on file changes
+- After each rebuild, open `chrome://extensions/` and click **Reload** on Visboard
+- Refresh the target webpage to load the latest content script changes
+
 ## Load in Chrome
 
 1. Open `chrome://extensions/`

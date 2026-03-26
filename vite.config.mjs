@@ -22,23 +22,27 @@ function copyExtensionFilesPlugin() {
   };
 }
 
-export default defineConfig({
-  build: {
-    outDir,
-    emptyOutDir: true,
-    minify: "esbuild",
-    sourcemap: false,
-    rollupOptions: {
-      input: {
-        background: resolve(rootDir, "src/background.js"),
-        content: resolve(rootDir, "src/content.js"),
-      },
-      output: {
-        entryFileNames: "src/[name].js",
-        chunkFileNames: "src/chunks/[name]-[hash].js",
-        assetFileNames: "src/assets/[name]-[hash][extname]",
+export default defineConfig(({ mode }) => {
+  const isDevelopment = mode === "development";
+
+  return {
+    build: {
+      outDir,
+      emptyOutDir: true,
+      minify: isDevelopment ? false : "esbuild",
+      sourcemap: isDevelopment,
+      rollupOptions: {
+        input: {
+          background: resolve(rootDir, "src/background.js"),
+          content: resolve(rootDir, "src/content.js"),
+        },
+        output: {
+          entryFileNames: "src/[name].js",
+          chunkFileNames: "src/chunks/[name]-[hash].js",
+          assetFileNames: "src/assets/[name]-[hash][extname]",
+        },
       },
     },
-  },
-  plugins: [copyExtensionFilesPlugin()],
+    plugins: [copyExtensionFilesPlugin()],
+  };
 });

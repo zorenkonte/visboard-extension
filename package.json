@@ -1,0 +1,13 @@
+{
+  "name": "visboard-extension",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Visboard Chrome extension",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "devDependencies": {
+    "vite": "^7.2.0"
+  }
+}

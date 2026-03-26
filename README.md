@@ -1,46 +1,44 @@
 # Visboard Chrome Extension
 
-Visboard is a lightweight screen annotation extension for Chrome. It adds a laser pointer / drawing overlay to any webpage, with smooth fade and shortcut-based controls.
+Visboard is a lightweight screen-annotation extension for Chrome. It currently ships a laser pointer tool and is structured for additional tools like pen, stickers, and shapes.
 
 ## Features
 
-- 🎯 Toggle annotation mode with keyboard shortcut
-- ✨ Smooth fading trail effect
-- 🖊️ Draw with mouse drag and hold
-- 🌈 Color support for marker and pointer (future expansion)
-- 🛠️ Hide UI and show only drawing overlay (future feature)
-- 🌐 Works on all websites
+- Toggle annotation mode with a keyboard shortcut
+- Smooth fading laser trail
+- Draw by click-and-drag
+- Blocks page interactions while drawing for consistent input
 
-## Installation
+## Development
 
-1. Open Chrome and go to `chrome://extensions/`
-2. Enable "Developer mode" in the top right
-3. Click "Load unpacked"
-4. Select the `laser-pointer-extension` folder (or your cloned repository folder)
+```bash
+npm install
+npm run build
+```
+
+- `npm run build` creates a minified extension package in `dist/`
+- Output keeps Chrome manifest paths (`src/background.js`, `src/content.js`, `src/laser.css`)
+
+## Load in Chrome
+
+1. Open `chrome://extensions/`
+2. Enable **Developer mode**
+3. Click **Load unpacked**
+4. Select the `dist/` folder
 
 ## Usage
 
-1. **Toggle Visboard Overlay**: 
+- Toggle Visboard overlay
    - Windows/Linux: `Ctrl + Shift + L`
    - macOS: `Command + Shift + L`
+- Draw: hold mouse button and drag
+- Exit: press `Esc` or toggle again
 
-2. **Draw**: Hold down the mouse button and drag on the page
-3. **Exit**: Press `Esc` or the toggle hotkey again
-4. While overlay is active, page interactions are throttled intentionally to keep drawing stable
+## Architecture
 
-## Shortcut Customization
-
-1. Open `chrome://extensions/shortcuts`
-2. Find "Toggle laser pointer" or "Visboard toggle"
-3. Set your preferred key combo
-
-## Project Structure
-
-- `manifest.json` — extension metadata and permissions
-- `background.js` — service worker controls extension behavior
-- `content.js` — injects overlay and handles pointer events
-- `laser.css` — overlay styles
-- `icon16.png`, `icon32.png`, `icon48.png`, `icon128.png` — extension icons
+- `src/content.js`: entrypoint + message routing
+- `src/features/tools/tool-manager.js`: tool registration/toggling abstraction
+- `src/features/laser/*`: laser-specific modules (`controller`, `trail`, `pointer`, `math`, `path`, `config`)
 
 ## License
 

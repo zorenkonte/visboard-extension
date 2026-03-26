@@ -40,7 +40,7 @@ Visboard is a lightweight screen annotation extension for Chrome. It adds a lase
 - `background.js` — service worker controls extension behavior
 - `content.js` — injects overlay and handles pointer events
 - `laser.css` — overlay styles
-- `icon16.png`, `icon48.png`, `icon128.png` — extension icons
+- `icon16.png`, `icon32.png`, `icon48.png`, `icon128.png` — extension icons
 
 ## License
 

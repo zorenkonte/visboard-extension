@@ -1,39 +1,37 @@
-import { DECAY_LENGTH, DECAY_TIME } from "./config";
-import { easeOut } from "./math";
-import { LaserPointer } from "./pointer";
+import { DECAY_LENGTH, DECAY_TIME } from './config';
+import { easeOut } from './math';
+import { LaserPointer } from './pointer';
 
 export class Trail {
-  constructor() {
-    this.pointer = null;
-  }
+  pointer: LaserPointer | null = null;
 
-  startPath(x, y) {
+  startPath(x: number, y: number): void {
     this.pointer = new LaserPointer({
       simplify: 0,
       streamline: 0.4,
       sizeMapping: (context) => {
-        const t = Math.max(0, 1 - (performance.now() - context.pressure) / DECAY_TIME);
-        const l =
+        const timeFactor = Math.max(0, 1 - (performance.now() - context.pressure) / DECAY_TIME);
+        const lengthFactor =
           (DECAY_LENGTH - Math.min(DECAY_LENGTH, context.totalLength - context.currentIndex)) /
           DECAY_LENGTH;
-        return Math.min(easeOut(l), easeOut(t));
+
+        return Math.min(easeOut(lengthFactor), easeOut(timeFactor));
       },
     });
 
     this.pointer.addPoint([x, y, performance.now()]);
   }
 
-  addPointToPath(x, y) {
+  addPointToPath(x: number, y: number): void {
     if (!this.pointer) return;
     this.pointer.addPoint([x, y, performance.now()]);
   }
 
-  endPath() {
-    if (!this.pointer) return;
-    this.pointer.close();
+  endPath(): void {
+    this.pointer?.close();
   }
 
-  isAlive() {
+  isAlive(): boolean {
     if (!this.pointer) return false;
     return this.pointer.getStrokeOutline().length > 0;
   }

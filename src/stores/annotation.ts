@@ -2,6 +2,8 @@ import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
 import {
   currentToolItem,
+  activeToolItem,
+  toolShortcutsItem,
   annotationEnabledItem,
   laserColorItem,
   penColorItem,
@@ -11,6 +13,7 @@ import {
   currentStickerItem,
 } from '../shared/storage';
 import { VISBOARD_MESSAGES, type ToolName } from '../shared/messages';
+import { DEFAULT_TOOL_SHORTCUTS, findShortcutConflict } from '../shared/shortcuts';
 import { STICKER_PACK } from '../features/stickers/controller';
 
 const availableTools: ToolName[] = ['laser', 'pen', 'shapes', 'stickers'];
@@ -23,6 +26,8 @@ export const useAnnotationStore = defineStore('annotation', () => {
   const ready = ref(false);
   const enabled = ref(false);
   const currentTool = ref<ToolName>('laser');
+  const activeTool = ref<ToolName | null>(null);
+  const toolShortcuts = ref<Record<ToolName, string>>({ ...DEFAULT_TOOL_SHORTCUTS });
   const laserColor = ref('#ff2b6e');
   const penColor = ref('#3b82f6');
   const penWidth = ref(3);
@@ -35,9 +40,11 @@ export const useAnnotationStore = defineStore('annotation', () => {
   const stickers = computed(() => STICKER_PACK);
 
   async function load(): Promise<void> {
-    const [storedEnabled, storedTool, storedLaserColor, storedPenColor, storedPenWidth, storedShapesColor, storedShapesType, storedSticker] = await Promise.all([
+    const [storedEnabled, storedTool, storedActiveTool, storedShortcuts, storedLaserColor, storedPenColor, storedPenWidth, storedShapesColor, storedShapesType, storedSticker] = await Promise.all([
       annotationEnabledItem.getValue(),
       currentToolItem.getValue(),
+      activeToolItem.getValue(),
+      toolShortcutsItem.getValue(),
       laserColorItem.getValue(),
       penColorItem.getValue(),
       penWidthItem.getValue(),
@@ -48,6 +55,8 @@ export const useAnnotationStore = defineStore('annotation', () => {
 
     enabled.value = storedEnabled;
     currentTool.value = storedTool;
+    activeTool.value = storedActiveTool;
+    toolShortcuts.value = { ...DEFAULT_TOOL_SHORTCUTS, ...storedShortcuts };
     laserColor.value = normalizeHexColor(storedLaserColor);
     penColor.value = normalizeHexColor(storedPenColor);
     penWidth.value = storedPenWidth;
@@ -59,6 +68,12 @@ export const useAnnotationStore = defineStore('annotation', () => {
 
   async function setEnabled(nextEnabled: boolean): Promise<void> {
     enabled.value = nextEnabled;
+    // Disabling the extension clears any active tool — re-enabling lands on
+    // "armed, no tool drawing" rather than auto-resuming.
+    if (!nextEnabled && activeTool.value !== null) {
+      activeTool.value = null;
+      await activeToolItem.setValue(null);
+    }
     await annotationEnabledItem.setValue(nextEnabled);
     await browser.runtime.sendMessage({
       type: VISBOARD_MESSAGES.SET_ACTIVE,
@@ -70,13 +85,32 @@ export const useAnnotationStore = defineStore('annotation', () => {
     await setEnabled(!enabled.value);
   }
 
+  async function setActiveTool(tool: ToolName | null): Promise<void> {
+    activeTool.value = tool;
+    await activeToolItem.setValue(tool);
+  }
+
+  async function toggleTool(tool: ToolName): Promise<void> {
+    if (!enabled.value) return;
+    await setActiveTool(activeTool.value === tool ? null : tool);
+  }
+
   async function setTool(tool: ToolName): Promise<void> {
+    // `currentTool` drives the popup settings panel; selecting a tool also
+    // activates it when the extension is enabled, so the popup stays a way to
+    // pick the working tool.
     currentTool.value = tool;
     await currentToolItem.setValue(tool);
-    await browser.runtime.sendMessage({
-      type: VISBOARD_MESSAGES.SET_TOOL,
-      tool,
-    });
+    if (enabled.value) {
+      await setActiveTool(tool);
+    }
+  }
+
+  async function setToolShortcut(tool: ToolName, combo: string): Promise<void> {
+    if (!combo) return;
+    if (findShortcutConflict(toolShortcuts.value, combo, tool) !== null) return;
+    toolShortcuts.value = { ...toolShortcuts.value, [tool]: combo };
+    await toolShortcutsItem.setValue(toolShortcuts.value);
   }
 
   async function setLaserColor(nextColor: string): Promise<void> {
@@ -122,6 +156,8 @@ export const useAnnotationStore = defineStore('annotation', () => {
     ready,
     enabled,
     currentTool,
+    activeTool,
+    toolShortcuts,
     laserColor,
     penColor,
     penWidth,
@@ -134,7 +170,10 @@ export const useAnnotationStore = defineStore('annotation', () => {
     load,
     setEnabled,
     toggleEnabled,
+    setActiveTool,
+    toggleTool,
     setTool,
+    setToolShortcut,
     setLaserColor,
     setPenColor,
     setPenWidth,

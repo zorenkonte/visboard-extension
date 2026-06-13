@@ -10,7 +10,6 @@ export class StickersController implements AnnotationTool {
   constructor(initialSticker: string = '😂') {
     this.currentSticker = initialSticker;
     this.handleClick = this.handleClick.bind(this);
-    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
   toggle(): void {
@@ -97,18 +96,11 @@ export class StickersController implements AnnotationTool {
     }, 3000);
   }
 
-  private handleKeyDown(event: KeyboardEvent): void {
-    if (!this.stickersActive || event.key !== 'Escape') return;
-    this.setEnabled(false);
-  }
-
   private addListeners(): void {
     window.addEventListener('click', this.handleClick, true);
-    window.addEventListener('keydown', this.handleKeyDown, true);
   }
 
   private removeListeners(): void {
     window.removeEventListener('click', this.handleClick, true);
-    window.removeEventListener('keydown', this.handleKeyDown, true);
   }
 }

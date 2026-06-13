@@ -4,12 +4,13 @@ import { storeToRefs } from 'pinia'
 import { Shapes } from 'lucide-vue-next'
 import { useAnnotationStore } from '../../stores/annotation'
 import ColorSwatch from '../../components/ui/ColorSwatch.vue'
+import KeyboardShortcutRecorder from '../../components/ui/KeyboardShortcutRecorder.vue'
 
 const SHAPE_TYPES = ['rect', 'circle', 'line'] as const
 type ShapeType = (typeof SHAPE_TYPES)[number]
 
 const store = useAnnotationStore()
-const { shapesColor, shapesType } = storeToRefs(store)
+const { shapesColor, shapesType, toolShortcuts } = storeToRefs(store)
 </script>
 
 <template>
@@ -48,6 +49,20 @@ const { shapesColor, shapesType } = storeToRefs(store)
           {{ shape }}
         </button>
       </div>
+    </div>
+
+    <!-- Toggle shortcut -->
+    <div class="border-t border-zinc-800 pt-3">
+      <div class="mb-2 flex items-center justify-between">
+        <p class="text-sm font-medium text-zinc-100">Shortcut</p>
+        <span class="text-[11px] text-zinc-400">Toggle this tool</span>
+      </div>
+      <KeyboardShortcutRecorder
+        :model-value="toolShortcuts.shapes"
+        :shortcuts="toolShortcuts"
+        tool="shapes"
+        @update:model-value="(v) => void store.setToolShortcut('shapes', v)"
+      />
     </div>
   </section>
 </template>

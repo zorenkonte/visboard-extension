@@ -16,7 +16,6 @@ export class ShapesController implements AnnotationTool {
     this.handlePointerMove = this.handlePointerMove.bind(this);
     this.handlePointerDown = this.handlePointerDown.bind(this);
     this.handlePointerUp = this.handlePointerUp.bind(this);
-    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
   toggle(): void {
@@ -137,17 +136,11 @@ export class ShapesController implements AnnotationTool {
     this.currentShape = null;
   }
 
-  private handleKeyDown(event: KeyboardEvent): void {
-    if (!this.shapesActive || event.key !== 'Escape') return;
-    this.setEnabled(false);
-  }
-
   private addListeners(): void {
     window.addEventListener('pointermove', this.handlePointerMove, true);
     window.addEventListener('pointerdown', this.handlePointerDown, true);
     window.addEventListener('pointerup', this.handlePointerUp, true);
     window.addEventListener('pointercancel', this.handlePointerUp, true);
-    window.addEventListener('keydown', this.handleKeyDown, true);
   }
 
   private removeListeners(): void {
@@ -155,6 +148,5 @@ export class ShapesController implements AnnotationTool {
     window.removeEventListener('pointerdown', this.handlePointerDown, true);
     window.removeEventListener('pointerup', this.handlePointerUp, true);
     window.removeEventListener('pointercancel', this.handlePointerUp, true);
-    window.removeEventListener('keydown', this.handleKeyDown, true);
   }
 }

@@ -1,5 +1,6 @@
 import { storage } from '#imports';
 import type { ToolName } from './messages';
+import { DEFAULT_TOOL_SHORTCUTS } from './shortcuts';
 
 export const DEFAULT_LASER_COLOR = '#ff2b6e';
 export const DEFAULT_PEN_COLOR = '#3b82f6';
@@ -14,6 +15,21 @@ export const annotationEnabledItem = storage.defineItem<boolean>('local:annotati
 export const currentToolItem = storage.defineItem<ToolName>('local:currentTool', {
   fallback: 'laser',
 });
+
+// Which tool's overlay is actively drawing. `null` means the extension is
+// enabled but armed with no tool — distinct from `currentTool`, which only
+// drives the popup's settings panel selection.
+export const activeToolItem = storage.defineItem<ToolName | null>('local:activeTool', {
+  fallback: null,
+});
+
+// User-customizable per-tool toggle shortcuts (canonical strings).
+export const toolShortcutsItem = storage.defineItem<Record<ToolName, string>>(
+  'local:toolShortcuts',
+  {
+    fallback: DEFAULT_TOOL_SHORTCUTS,
+  },
+);
 
 export const laserColorItem = storage.defineItem<string>('local:laserColor', {
   fallback: DEFAULT_LASER_COLOR,

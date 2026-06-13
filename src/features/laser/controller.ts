@@ -21,7 +21,6 @@ export class LaserController {
     this.handlePointerDown = this.handlePointerDown.bind(this);
     this.handlePointerUp = this.handlePointerUp.bind(this);
     this.handleClickBlock = this.handleClickBlock.bind(this);
-    this.handleKeyDown = this.handleKeyDown.bind(this);
     this.tick = this.tick.bind(this);
   }
 
@@ -211,12 +210,6 @@ export class LaserController {
     this.consumeLaserEvent(event);
   }
 
-  private handleKeyDown(event: KeyboardEvent): void {
-    if (!this.laserActive || event.key !== 'Escape') return;
-    this.consumeLaserEvent(event);
-    this.setEnabled(false);
-  }
-
   private addListeners(): void {
     window.addEventListener('pointermove', this.handlePointerMove, true);
     window.addEventListener('pointerdown', this.handlePointerDown, true);
@@ -225,7 +218,6 @@ export class LaserController {
     window.addEventListener('click', this.handleClickBlock, true);
     window.addEventListener('auxclick', this.handleClickBlock, true);
     window.addEventListener('contextmenu', this.handleClickBlock, true);
-    window.addEventListener('keydown', this.handleKeyDown, true);
   }
 
   private removeListeners(): void {
@@ -236,6 +228,5 @@ export class LaserController {
     window.removeEventListener('click', this.handleClickBlock, true);
     window.removeEventListener('auxclick', this.handleClickBlock, true);
     window.removeEventListener('contextmenu', this.handleClickBlock, true);
-    window.removeEventListener('keydown', this.handleKeyDown, true);
   }
 }

@@ -5,9 +5,10 @@ import { PenSquare } from 'lucide-vue-next'
 import { useAnnotationStore } from '../../stores/annotation'
 import ColorSwatch from '../../components/ui/ColorSwatch.vue'
 import StepControl from '../../components/ui/StepControl.vue'
+import KeyboardShortcutRecorder from '../../components/ui/KeyboardShortcutRecorder.vue'
 
 const store = useAnnotationStore()
-const { penColor, penWidth } = storeToRefs(store)
+const { penColor, penWidth, toolShortcuts } = storeToRefs(store)
 </script>
 
 <template>
@@ -39,6 +40,20 @@ const { penColor, penWidth } = storeToRefs(store)
         :max="20"
         color="#60a5fa"
         @update:model-value="(v) => void store.setPenWidth(v)"
+      />
+    </div>
+
+    <!-- Toggle shortcut -->
+    <div class="border-t border-zinc-800 pt-3">
+      <div class="mb-2 flex items-center justify-between">
+        <p class="text-sm font-medium text-zinc-100">Shortcut</p>
+        <span class="text-[11px] text-zinc-400">Toggle this tool</span>
+      </div>
+      <KeyboardShortcutRecorder
+        :model-value="toolShortcuts.pen"
+        :shortcuts="toolShortcuts"
+        tool="pen"
+        @update:model-value="(v) => void store.setToolShortcut('pen', v)"
       />
     </div>
   </section>

@@ -90,8 +90,11 @@ src/
 - **Shapes** — click-and-drag rectangles, circles, and lines
 - **Stickers** — click to stamp emoji that fade in and auto-expire
 - Full-screen SVG overlay blocks page interactions while a tool is active
-- `Esc` to exit annotation mode
-- Keyboard command toggle (`Ctrl/Cmd + Shift + L`)
+- `Esc` to deactivate the current tool
+- **Master enable gate** (`Ctrl/Cmd + Shift + L`) — arms the extension without
+  auto-activating any tool
+- **Per-tool toggle shortcuts**, customizable from inside the popup (defaults
+  `Ctrl/Cmd + Shift + 1..4`); tool shortcuts only work once the extension is enabled
 - `ToolManager` architecture — only one tool active at a time, easy to extend
 
 ## 5) Popup UI
@@ -160,13 +163,18 @@ npm run zip
 
 ## 9) Usage
 
-- Toggle annotation mode:
+- Enable the extension (master gate — does not activate a tool by itself):
    - Windows/Linux: `Ctrl + Shift + L`
    - macOS: `Command + Shift + L`
-- Open popup from extension toolbar icon
-- Pick a tool (laser / pen / shapes / stickers) and adjust its settings
+- Activate a tool once enabled, either by:
+   - clicking it in the popup, or
+   - pressing its keyboard shortcut (default `Ctrl/Cmd + Shift + 1..4`)
+- Customize a tool's shortcut in the popup: open its settings panel and click the
+  shortcut field, then press your preferred combo (must include Ctrl/Cmd or Alt;
+  conflicts with another tool or the master toggle are rejected)
+- Adjust each tool's settings in its panel
 - Draw by click + drag (laser, pen, shapes) or click to stamp (stickers)
-- Press `Esc` to stop active annotation
+- Press `Esc` to deactivate the current tool
 
 ## License
 

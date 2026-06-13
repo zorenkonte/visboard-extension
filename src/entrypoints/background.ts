@@ -1,4 +1,4 @@
-import { annotationEnabledItem } from '../shared/storage';
+import { annotationEnabledItem, activeToolItem } from '../shared/storage';
 import { VISBOARD_MESSAGES, type VisboardMessage } from '../shared/messages';
 
 async function sendToActiveTab(message: VisboardMessage): Promise<void> {
@@ -17,9 +17,13 @@ export default defineBackground(() => {
   browser.commands.onCommand.addListener(async (command) => {
     if (command !== 'toggle-laser') return;
 
+    // Master gate only: toggles the extension without activating any tool.
     const enabled = await annotationEnabledItem.getValue();
     const nextEnabled = !enabled;
     await annotationEnabledItem.setValue(nextEnabled);
+    if (!nextEnabled) {
+      await activeToolItem.setValue(null);
+    }
     await sendToActiveTab({ type: VISBOARD_MESSAGES.SET_ACTIVE, enabled: nextEnabled });
   });
 

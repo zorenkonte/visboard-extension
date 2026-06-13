@@ -2,6 +2,7 @@
 // Annotation mode card: enable/disable toggle + keyboard shortcut hint.
 import { storeToRefs } from 'pinia'
 import { useAnnotationStore } from '../../stores/annotation'
+import { MASTER_SHORTCUT, formatShortcut } from '../../shared/shortcuts'
 import ToggleSwitch from '../ui/ToggleSwitch.vue'
 
 const store = useAnnotationStore()
@@ -23,7 +24,7 @@ const { enabled } = storeToRefs(store)
 
     <!-- Keyboard shortcut hint -->
     <div class="rounded-lg border border-cyan-400/25 bg-cyan-400/5 px-2 py-1 text-[11px] text-cyan-200">
-      Shortcut: <span class="font-semibold">Ctrl/Cmd + Shift + L</span>
+      Shortcut: <span class="font-semibold">{{ formatShortcut(MASTER_SHORTCUT) }}</span>
     </div>
   </section>
 </template>

@@ -4,9 +4,10 @@ import { storeToRefs } from 'pinia'
 import { Sparkles } from 'lucide-vue-next'
 import { useAnnotationStore } from '../../stores/annotation'
 import ColorSwatch from '../../components/ui/ColorSwatch.vue'
+import KeyboardShortcutRecorder from '../../components/ui/KeyboardShortcutRecorder.vue'
 
 const store = useAnnotationStore()
-const { laserColor } = storeToRefs(store)
+const { laserColor, toolShortcuts } = storeToRefs(store)
 </script>
 
 <template>
@@ -38,6 +39,20 @@ const { laserColor } = storeToRefs(store)
         </div>
         <p class="text-xs font-mono uppercase tracking-wide text-zinc-300">{{ laserColor }}</p>
       </div>
+    </div>
+
+    <!-- Toggle shortcut -->
+    <div class="mt-3 border-t border-zinc-800 pt-3">
+      <div class="mb-2 flex items-center justify-between">
+        <p class="text-sm font-medium text-zinc-100">Shortcut</p>
+        <span class="text-[11px] text-zinc-400">Toggle this tool</span>
+      </div>
+      <KeyboardShortcutRecorder
+        :model-value="toolShortcuts.laser"
+        :shortcuts="toolShortcuts"
+        tool="laser"
+        @update:model-value="(v) => void store.setToolShortcut('laser', v)"
+      />
     </div>
   </section>
 </template>

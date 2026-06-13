@@ -3,9 +3,10 @@
 import { storeToRefs } from 'pinia'
 import { Sticker } from 'lucide-vue-next'
 import { useAnnotationStore } from '../../stores/annotation'
+import KeyboardShortcutRecorder from '../../components/ui/KeyboardShortcutRecorder.vue'
 
 const store = useAnnotationStore()
-const { currentSticker, stickers } = storeToRefs(store)
+const { currentSticker, stickers, toolShortcuts } = storeToRefs(store)
 </script>
 
 <template>
@@ -30,6 +31,20 @@ const { currentSticker, stickers } = storeToRefs(store)
       >
         <span class="text-xl leading-none select-none">{{ sticker }}</span>
       </button>
+    </div>
+
+    <!-- Toggle shortcut -->
+    <div class="mt-3 border-t border-zinc-800 pt-3">
+      <div class="mb-2 flex items-center justify-between">
+        <p class="text-sm font-medium text-zinc-100">Shortcut</p>
+        <span class="text-[11px] text-zinc-400">Toggle this tool</span>
+      </div>
+      <KeyboardShortcutRecorder
+        :model-value="toolShortcuts.stickers"
+        :shortcuts="toolShortcuts"
+        tool="stickers"
+        @update:model-value="(v) => void store.setToolShortcut('stickers', v)"
+      />
     </div>
   </section>
 </template>

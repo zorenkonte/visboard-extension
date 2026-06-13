@@ -37,13 +37,26 @@ npm run dev:chrome
 ```txt
 src/
    entrypoints/
-      background.ts
-      content.ts
+      background.ts            # service worker: command + message router
+      content.ts               # injected on <all_urls>: wires tools to storage/messages
       popup/
          index.html
          main.ts
-         App.vue
-   features/
+         App.vue               # popup shell + tool-panel orchestration
+   components/                 # reusable popup UI
+      layout/PopupHeader.vue
+      popup/AnnotationToggle.vue
+      popup/ToolSelector.vue
+      popup/StatusFooter.vue
+      ui/ColorSwatch.vue
+      ui/StepControl.vue
+      ui/ToggleSwitch.vue
+   modules/                    # per-tool settings panels (popup side)
+      laser/LaserSettings.vue
+      pen/PenSettings.vue
+      shapes/ShapesSettings.vue
+      stickers/StickersSettings.vue
+   features/                   # page-side tool logic
       laser/
          config.ts
          controller.ts
@@ -51,8 +64,10 @@ src/
          path.ts
          pointer.ts
          trail.ts
-      tools/
-         tool-manager.ts
+      pen/controller.ts
+      shapes/controller.ts
+      stickers/controller.ts
+      tools/tool-manager.ts
    shared/
       messages.ts
       storage.ts
@@ -64,22 +79,32 @@ src/
    env.d.ts
 ```
 
-## 4) Core Features Preserved
+> Note: `features/` holds the page-side drawing logic; `modules/` holds the
+> matching Vue settings panels rendered in the popup.
 
-- Laser pointer with smooth fading trail
-- Click-and-drag drawing
-- Overlay blocks page interactions while active
+## 4) Core Features
+
+- **Laser pointer** with a smooth, self-decaying fading trail (custom
+  stroke-outline geometry + `requestAnimationFrame` render loop)
+- **Pen** — persistent freehand drawing with configurable color and width
+- **Shapes** — click-and-drag rectangles, circles, and lines
+- **Stickers** — click to stamp emoji that fade in and auto-expire
+- Full-screen SVG overlay blocks page interactions while a tool is active
 - `Esc` to exit annotation mode
 - Keyboard command toggle (`Ctrl/Cmd + Shift + L`)
-- Tool-manager architecture for future tools (Pen, Shapes, Stickers)
+- `ToolManager` architecture — only one tool active at a time, easy to extend
 
-## 5) Popup UI Improvements
+## 5) Popup UI
 
 - Futuristic glassmorphism panel with neon glow effects
 - Visboard branding and logo treatment
 - Annotation mode toggle
-- Tool section with future-ready tabs/buttons
-- Live laser color picker with instant preview
+- Tool selector (laser / pen / shapes / stickers)
+- Per-tool settings panel that swaps with an animated transition:
+   - Laser: color picker
+   - Pen: color picker + width step control
+   - Shapes: color picker + shape type (rect / circle / line)
+   - Stickers: emoji picker from the sticker pack
 - Shortcut display + live sync status
 
 ## 6) State, Persistence, and Messaging
@@ -89,7 +114,8 @@ src/
 - `src/stores/annotation.ts` manages:
    - enabled/disabled annotation state
    - selected tool
-   - laser color
+   - per-tool settings: laser color, pen color, pen width, shapes color,
+     shapes type, current sticker
 
 ### Persistence (WXT storage helpers)
 
@@ -97,6 +123,13 @@ src/
    - `local:annotationEnabled`
    - `local:currentTool`
    - `local:laserColor`
+   - `local:penColor`
+   - `local:penWidth`
+   - `local:shapesColor`
+   - `local:shapesType`
+   - `local:currentSticker`
+- The content script uses `storage.watch(...)` on these keys, so popup
+  changes propagate live to the active page.
 
 ### Popup ↔ Content communication
 
@@ -131,7 +164,8 @@ npm run zip
    - Windows/Linux: `Ctrl + Shift + L`
    - macOS: `Command + Shift + L`
 - Open popup from extension toolbar icon
-- Draw laser trail by click + drag
+- Pick a tool (laser / pen / shapes / stickers) and adjust its settings
+- Draw by click + drag (laser, pen, shapes) or click to stamp (stickers)
 - Press `Esc` to stop active annotation
 
 ## License

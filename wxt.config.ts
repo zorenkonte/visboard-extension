@@ -8,7 +8,8 @@ export default defineConfig({
   manifest: {
     name: 'Visboard',
     description: 'Futuristic browser annotation with laser-pointer precision.',
-    permissions: ['storage', 'activeTab'],
+    permissions: ['storage', 'activeTab', 'scripting'],
+    host_permissions: ['<all_urls>'],
     commands: {
       'toggle-laser': {
         suggested_key: {

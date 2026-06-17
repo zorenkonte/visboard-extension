@@ -16,7 +16,7 @@ import {
   shapesColorItem,
   shapesTypeItem,
   currentStickerItem,
-} from '../shared/storage';
+} from '../shared/content-storage';
 
 const TOOL_NAMES: ToolName[] = ['laser', 'pen', 'shapes', 'stickers'];
 
